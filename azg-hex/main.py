@@ -27,6 +27,7 @@ args = dotdict({
     'numItersForTrainExamplesHistory': 20,
     'use_mohex_examples': False,
     'mohex_train_examples_file': '6_6_13445.examples'
+    
 })
 
 
