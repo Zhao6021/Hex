@@ -32,13 +32,15 @@ class NNetWrapper(NeuralNet):
 
         if args.cuda:
             self.nnet.cuda()
+        else:
+            print('cuda is not available!')
 
     def train(self, examples):
         """
         examples: list of examples, each example is of form (board, pi, v)
         """
         optimizer = optim.Adam(self.nnet.parameters())
-        print(examples[0])
+        #print(examples[0])
         #print(examples[2])
         #print(examples[15])
         #pause = input()

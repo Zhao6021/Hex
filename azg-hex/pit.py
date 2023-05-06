@@ -15,7 +15,7 @@ any agent.
 
 mini_hex = True  # Play in 6x6 instead of the normal 8x8.
 human_vs_cpu = False
-cpu_random_player = True
+cpu_random_player = False
 
 if mini_hex:
     g = HexGame(6)
@@ -33,9 +33,9 @@ hp = HumanHexPlayer(g).play
 if not cpu_random_player:
     n1 = NNet(g)
     if mini_hex:
-        n1.load_checkpoint('./pretrained_models/othello/pytorch/','6x100x25_best.pth.tar')
+        n1.load_checkpoint('./models/','6x6_100.pth.tar')
     else:
-        n1.load_checkpoint('./pretrained_models/othello/pytorch/','8x8_100checkpoints_best.pth.tar')
+        n1.load_checkpoint('./models/','8x8_.pth.tar')
     args1 = dotdict({'numMCTSSims': 50, 'cpuct':1.0})
     mcts1 = MCTS(g, n1, args1)
     n1p = lambda x, player: np.argmax(mcts1.getActionProb(x, player, temp=0))
@@ -47,7 +47,7 @@ if human_vs_cpu:
         n1p = rp
 else:
     n2 = NNet(g)
-    n2.load_checkpoint('./pretrained_models/othello/pytorch/', '8x8_100checkpoints_best.pth.tar')
+    n2.load_checkpoint('./models/','6x6_80.pth.tar')
     args2 = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
     mcts2 = MCTS(g, n2, args2)
     n2p = lambda x, player: np.argmax(mcts2.getActionProb(x, player, temp=0))
@@ -56,4 +56,4 @@ else:
 
 arena = Arena.Arena(n1p, player2, g, display=HexGame.display1)
 
-print(arena.playGames(2, verbose=True))
+print(arena.playGames(20, verbose=False))
