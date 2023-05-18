@@ -184,6 +184,7 @@ class Coach():
             log.info("Loading mohex_examples...")
             examplesFile = self.args.mohex_train_examples_file
             with open(examplesFile, "rb") as f:
-                self.trainExamplesHistory = Unpickler(f).load()
+                mohex_examples = Unpickler(f).load()
+                self.trainExamplesHistory.append(mohex_examples)
             log.info('Loading done!')
             self.skipFirstSelfPlay = True
