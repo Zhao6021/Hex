@@ -25,15 +25,15 @@ args = dotdict({
     'load_model': False,
     'load_folder_file': ('/dev/models/8x100x50','best.pth.tar'),
     'numItersForTrainExamplesHistory': 20,
-    'use_mohex_examples': True,
-    'mohex_train_examples_file': 'azg-hex/6_6_13445.examples'
+    'use_mohex_examples': False,
+    'mohex_train_examples_file': 'azg-hex/6_6_5178.examples'
     
 })
 
 
 def main():
     log.info('Loading %s...', Game.__name__)
-    g = Game(7)
+    g = Game(9)
 
     log.info('Loading %s...', nn.__name__)
     nnet = nn(g)

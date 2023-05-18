@@ -33,7 +33,7 @@ hp = HumanHexPlayer(g).play
 if not cpu_random_player:
     n1 = NNet(g)
     if mini_hex:
-        n1.load_checkpoint('./models/','6x6_100.pth.tar')
+        n1.load_checkpoint('./models/','6x6withSolve_5k_40.pth.tar')
     else:
         n1.load_checkpoint('./models/','8x8_.pth.tar')
     args1 = dotdict({'numMCTSSims': 50, 'cpuct':1.0})
@@ -47,7 +47,7 @@ if human_vs_cpu:
         n1p = rp
 else:
     n2 = NNet(g)
-    n2.load_checkpoint('./models/','6x6_80.pth.tar')
+    n2.load_checkpoint('./models/','6x6_40.pth.tar')
     args2 = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
     mcts2 = MCTS(g, n2, args2)
     n2p = lambda x, player: np.argmax(mcts2.getActionProb(x, player, temp=0))
@@ -56,4 +56,4 @@ else:
 
 arena = Arena.Arena(n1p, player2, g, display=HexGame.display1)
 
-print(arena.playGames(20, verbose=False))
+print(arena.playGames(100, verbose=False))
