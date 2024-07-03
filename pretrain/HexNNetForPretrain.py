@@ -38,14 +38,22 @@ class HexNNet(nn.Module):
         self.fc4 = nn.Linear(512, 1)
 
     def forward(self, s):
-        #                                                           s: batch_size x board_x x board_y
+        #    
+        print(s.shape)                                                     # s: batch_size x board_x x board_y
         s = s.view(-1, 1, self.board_x, self.board_y)                # batch_size x 1 x board_x x board_y
+        print('s0')
+        print(s.shape)
         s = F.relu(self.bn1(self.conv1(s)))                          # batch_size x num_channels x board_x x board_y
+        print('s1')
+        print(s.shape)
         s = F.relu(self.bn2(self.conv2(s)))                          # batch_size x num_channels x board_x x board_y
+        print('s2')
+        print(s.shape)
+        c = input()
         s = F.relu(self.bn3(self.conv3(s)))                          # batch_size x num_channels x (board_x-2) x (board_y-2)
         s = F.relu(self.bn4(self.conv4(s)))                          # batch_size x num_channels x (board_x-4) x (board_y-4)
-        s = s.view(-1, self.args.num_channels*(self.board_x-4)*(self.board_y-4))
 
+        s = s.view(-1, self.args.num_channels*(self.board_x-4)*(self.board_y-4))
         s = F.dropout(F.relu(self.fc_bn1(self.fc1(s))), p=self.args.dropout, training=self.training)  # batch_size x 1024
         s = F.dropout(F.relu(self.fc_bn2(self.fc2(s))), p=self.args.dropout, training=self.training)  # batch_size x 512
 

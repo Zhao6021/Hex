@@ -1,13 +1,19 @@
 import numpy as np
 
 
+"""
+the play method of Player give original board ,player and return action in canonical board
+this is correct for play from mcts too
+"""
+
 class RandomPlayer():
     def __init__(self, game):
         self.game = game
 
-    def play(self, board):
+    def play(self, board, player):
+        canonicalBoard = self.game.getCanonicalForm(board, player)
         a = np.random.randint(self.game.getActionSize())
-        valids = self.game.getValidMoves(board, 1)
+        valids = self.game.getValidMoves(canonicalBoard, 1)
         while valids[a]!=1:
             a = np.random.randint(self.game.getActionSize())
         return a
@@ -17,42 +23,91 @@ class HumanHexPlayer():
     def __init__(self, game):
         self.game = game
 
-    def play(self, board):
+    def getCanonicalPosition(self, pos, player):
+        if player == 1:
+            return pos
+
+        n = self.game.n
+        x, y = pos
+        board = np.zeros(shape=(n, n))
+        board[x][y] = 1
+        board = self.game.getCanonicalForm(board, -1)
+        loc = np.where(board == -1)
+        x, y = loc[0][0], loc[1][0]
+        return (x, y)
+
+    def play(self, board, player):
         # display(board)
-        valid = self.game.getValidMoves(board, 1)
-        for i in range(len(valid)):
-            if valid[i]:
-                print("[", int(i/self.game.n), int(i%self.game.n), end="] ")
+        canonicalBoard = self.game.getCanonicalForm(board, player)
+        valid = self.game.getValidMoves(canonicalBoard, 1)
+        # for i in range(len(valid)):
+        #     if not valid[i]:
+        #         print(int(i/self.game.n), int(i%self.game.n))        
         while True:
-            input_move = input()
-            input_a = input_move.split(" ")
-            if len(input_a) == 2:
-                try:
-                    x,y = [int(i) for i in input_a]
-                    if ((0 <= x) and (x < self.game.n) and (0 <= y) and (y < self.game.n)):
-                        a = self.game.n * x + y if x != -1 else self.game.n ** 2
-                        if valid[a]:
-                            break
-                except ValueError:
-                    # Input needs to be an integer
-                    'Invalid integer'
-            print('Invalid move')
+            a = input()
+
+            x, y = [int(x) for x in a.split(' ')]
+            x, y = self.getCanonicalPosition((x, y), player)
+            a = self.game.n * x + y
+            if valid[a]:
+                break
+            else:
+                print('Invalid')
+
         return a
 
-'''
-class GreedyOthelloPlayer():
-    def __init__(self, game):
-        self.game = game
 
-    def play(self, board):
-        valids = self.game.getValidMoves(board, 1)
-        candidates = []
-        for a in range(self.game.getActionSize()):
-            if valids[a]==0:
-                continue
-            nextBoard, _ = self.game.getNextState(board, 1, a)
-            score = self.game.getScore(nextBoard, 1)
-            candidates += [(-score, a)]
-        candidates.sort()
-        return candidates[0][1]
-'''
+class AlphaBetaPlayer():
+    """ 
+    from https://github.com/aebrahimian/alpha-zero-hex
+    this is for alpha-beta player
+    """    
+    def __init__(self, game, maxDepth):
+        self.game = game
+        self.maxDepth = maxDepth
+        self.sim_count = 0
+
+    def alphaBeta(self, board, depth, alpha, beta, maximizingPlayer, player):
+        """ 
+        board here is in canonical foarm for the root player who call play of AlphaBeta
+        """
+
+        # print('depth {} alpha {} beta {} maximizingPlayer {} player {}'.format(depth, alpha, beta, maximizingPlayer, player))
+        # display(board)
+
+        self.sim_count += 1
+
+        if depth == 0 or self.game.getGameEnded(board, 1) != 0:
+            return self.game.getScore(board), None
+
+        valids = self.game.getValidMoves(board, player)
+            
+        if maximizingPlayer:
+            value = (float('-inf'), None)
+            for action in range(self.game.getActionSize()):
+                if valids[action]==0:
+                    continue
+                nextBoard, _ = self.game.getNextState(board, player, action)
+                childValue, childAction = self.alphaBeta(nextBoard, depth - 1, alpha, beta, False, -player)
+                value = max(value, (childValue, action), key=lambda t: t[0])
+                alpha = max(alpha, value[0])
+                if alpha >= beta:
+                    break
+            return value                                           
+        else:
+            value = (float('inf'), None)
+            for action in range(self.game.getActionSize()):
+                if valids[action]==0:
+                    continue
+                nextBoard, _ = self.game.getNextState(board, player, action)
+                childValue, childAction = self.alphaBeta(nextBoard, depth - 1, alpha, beta, True, -player)
+                value = min(value, (childValue, action), key=lambda t: t[0])
+                beta = min(beta, value[0])
+                if alpha >= beta:
+                    break
+            return value
+
+    def play(self, board, player):
+        canonicalBoard = self.game.getCanonicalForm(board, player)
+        score, action = self.alphaBeta(canonicalBoard, self.maxDepth, float('-inf'), float('inf'), True, 1)
+        return action

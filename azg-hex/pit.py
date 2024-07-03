@@ -13,30 +13,23 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-mini_hex = True  # Play in 6x6 instead of the normal 8x8.
 human_vs_cpu = False
 cpu_random_player = False
 
-if mini_hex:
-    g = HexGame(6)
-else:
-    g = HexGame(8)
+
+g = HexGame(8)
 
 # all players
 rp = RandomPlayer(g).play
-#gp = GreedyOthelloPlayer(g).play
 hp = HumanHexPlayer(g).play
-
+abp = AlphaBetaPlayer(g, 3).play
 
 
 # nnet players
 if not cpu_random_player:
     n1 = NNet(g)
-    if mini_hex:
-        n1.load_checkpoint('./models/','6x6withSolve_5k_40.pth.tar')
-    else:
-        n1.load_checkpoint('./models/','8x8_.pth.tar')
-    args1 = dotdict({'numMCTSSims': 50, 'cpuct':1.0})
+    n1.load_checkpoint('./models/','6to8x8_method3_202.pth.tar')
+    args1 = dotdict({'numMCTSSims': 3000, 'cpuct':3.0})
     mcts1 = MCTS(g, n1, args1)
     n1p = lambda x, player: np.argmax(mcts1.getActionProb(x, player, temp=0))
 
@@ -47,8 +40,8 @@ if human_vs_cpu:
         n1p = rp
 else:
     n2 = NNet(g)
-    n2.load_checkpoint('./models/','6x6_40.pth.tar')
-    args2 = dotdict({'numMCTSSims': 50, 'cpuct': 1.0})
+    n2.load_checkpoint('./models/','6to8x8_method3_300.pth.tar')
+    args2 = dotdict({'numMCTSSims': 3000, 'cpuct': 3.0})
     mcts2 = MCTS(g, n2, args2)
     n2p = lambda x, player: np.argmax(mcts2.getActionProb(x, player, temp=0))
 
@@ -56,4 +49,4 @@ else:
 
 arena = Arena.Arena(n1p, player2, g, display=HexGame.display1)
 
-print(arena.playGames(100, verbose=False))
+print(arena.playGames(10, verbose=False))

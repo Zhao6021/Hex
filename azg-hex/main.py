@@ -33,7 +33,7 @@ args = dotdict({
 
 def main():
     log.info('Loading %s...', Game.__name__)
-    g = Game(9)
+    g = Game(6)
 
     log.info('Loading %s...', nn.__name__)
     nnet = nn(g)

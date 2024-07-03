@@ -108,12 +108,21 @@ class HexGame(Game):
         board_s = "".join(self.square_content[square] for row in board for square in row)
         return board_s
 
-    '''
-    def getScore(self, board, player):
+    def getScore(self, board):
+        """ 
+        from https://github.com/aebrahimian/alpha-zero-hex
+        this is for alpha-beta player
+        """        
         b = Board(self.n)
-        b.pieces = np.copy(board)
-        return b.countDiff(player)
-    '''
+
+        b.pieces = board
+        my_count, my_path = b.count_to_connect()
+
+        b.pieces = self.getCanonicalForm(board, -1)
+        enemy_count, enemy_path = b.count_to_connect()
+
+        # print('my count', my_count, 'enemy count', enemy_count) 
+        return enemy_count - my_count
 
     @staticmethod
     def display(board):
@@ -133,15 +142,18 @@ class HexGame(Game):
         print("-----------------------")
 
     def display1(board):
+        """ 
+        from https://github.com/aebrahimian/alpha-zero-hex
+        """    
         n = board.shape[0]
 
-        print("   ", "W  " * n, "\n    ", end="")
+        print("   ", "B  " * n, "\n    ", end="")
         for y in range(n):
             print (y, "\\",end="")
         print("")
         print("", "----" * n)
         for y in range(n):
-            print(" " * y, "B", y, "\\",end="")    # print the row #
+            print(" " * y, "W", y, "\\",end="")    # print the row #
             for x in range(n):
                 piece = board[x][y]    # get the piece to print
                 if piece == -1: print("b  ",end="")
@@ -151,11 +163,11 @@ class HexGame(Game):
                         print("-",end="")
                     else:
                         print("-  ",end="")
-            print("\\ {} B".format(y))
+            print("\\ {} W".format(y))
 
         print(" " * n, "----" * n)
         print("      ", " " * n, end="")
         for y in range(n):
             print (y, "\\",end="")
         print("")        
-        print("      ", " " * n, "W  " * n)
+        print("      ", " " * n, "B  " * n)

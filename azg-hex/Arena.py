@@ -1,5 +1,5 @@
 import logging
-
+import time
 from tqdm import tqdm
 
 log = logging.getLogger(__name__)
@@ -43,6 +43,7 @@ class Arena():
         board = self.game.getInitBoard()
         it = 0
         while self.game.getGameEnded(board, -curPlayer) == 0:
+            start_time = time.time()
             it += 1
             if verbose:
                 assert self.display
@@ -63,6 +64,10 @@ class Arena():
             
             board, _ = self.game.getNextState(self.game.getCanonicalForm(board, curPlayer), 1, action)
             board = self.game.getOriginalForm(board, curPlayer)
+            end_time = time.time() 
+            spend_time = end_time-start_time
+            if verbose:
+                print('player '+str(curPlayer)+' use ', spend_time)
             curPlayer = -curPlayer
 
         if verbose:
@@ -92,10 +97,14 @@ class Arena():
         oneWon = 0
         twoWon = 0
         draws = 0
+
+        oneWon_first = 0
+        twoWon_first = 0
         for _ in tqdm(range(num), desc="Arena.playGames (1)"):
             gameResult = self.playGame(verbose=verbose)
             if gameResult == 1:
                 oneWon += 1
+                oneWon_first += 1
             elif gameResult == -1:
                 twoWon += 1
             else:
@@ -109,7 +118,9 @@ class Arena():
                 oneWon += 1
             elif gameResult == 1:
                 twoWon += 1
+                twoWon_first += 1
             else:
                 draws += 1
-
+        print('P1_first_win num:', oneWon_first)
+        print('P2_first_win num:', twoWon_first)
         return oneWon, twoWon, draws

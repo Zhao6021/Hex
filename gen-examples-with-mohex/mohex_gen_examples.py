@@ -69,7 +69,7 @@ def genExamples(args):
             #print(mohex_ans)
             pi_board_2D = getPiBoard2D(args.boardSize, mohex_ans)
             #print(pi_board_2D)
-            if curPlayer=='w':   #player = -1
+            if curPlayer=='w':
                 pi_board_2D = np.fliplr(np.rot90(pi_board_2D, axes=(1, 0)))
             pi_board = pi_board_2D.flatten().tolist()
             e.append(pi_board)

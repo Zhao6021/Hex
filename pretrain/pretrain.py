@@ -23,7 +23,7 @@ else:
 nnet = nn(board_size)
 shuffle(examples)
 nnet.train(examples)
-nnet.save_checkpoint('pretrain/pre_model','pretrain.pth.tar')
+nnet.save_checkpoint('pretrain/pre_model','pretrain_test.pth.tar')
 
 """
 nnet2 = nn(board_size)

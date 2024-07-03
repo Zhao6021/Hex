@@ -41,7 +41,7 @@ class Coach():
         uses temp=0.
 
         Returns:
-            trainExamples: a list of examples of the form (canonicalBoard, currPlayer, pi,v)
+            trainExamples: a list of examples of the form (canonicalBoard, curPlayer, pi,v)
                            pi is the MCTS informed policy vector, v is +1 if
                            the player eventually won the game, else -1.
         """
@@ -126,7 +126,6 @@ class Coach():
             print(type(trainExamples[-1]))
             print(type(trainExamples[-1][0]),type(trainExamples[-1][1]),type(trainExamples[-1][2]))
             c = input() '''
-            
             shuffle(trainExamples)
 
             # training new network, keeping a copy of the old one
